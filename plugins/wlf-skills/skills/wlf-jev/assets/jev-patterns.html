@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jev Question Patterns</title>
+<style>
+:root {
+  --bg: #f7f7f5; --surface: #ffffff; --surface-2: #f0f0ec; --text: #1c1d1f; --muted: #5d6066;
+  --line: #dcdcd6; --accent: #2f6fd6; --accent-soft: #dbe7fb; --good: #2e8b57; --warn: #c2861a;
+  --bad: #c44536; --band: #f3e6c4; --shadow: 0 1px 2px rgba(0,0,0,.06), 0 4px 16px rgba(0,0,0,.05);
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #141518; --surface: #1c1e22; --surface-2: #24272c; --text: #e8e9eb; --muted: #a2a6ad;
+    --line: #34383f; --accent: #6ea0ff; --accent-soft: #1f3253; --good: #5cc08a; --warn: #e0a940;
+    --bad: #f07a6b; --band: #3d3420; --shadow: 0 1px 2px rgba(0,0,0,.4);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #141518; --surface: #1c1e22; --surface-2: #24272c; --text: #e8e9eb; --muted: #a2a6ad;
+  --line: #34383f; --accent: #6ea0ff; --accent-soft: #1f3253; --good: #5cc08a; --warn: #e0a940;
+  --bad: #f07a6b; --band: #3d3420; --shadow: 0 1px 2px rgba(0,0,0,.4);
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.55 var(--sans); }
+main { max-width: 1040px; margin: 0 auto; padding: 32px 16px 64px; }
+header.top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 8px; }
+h1 { font-size: 1.9rem; line-height: 1.2; margin: 0 0 6px; letter-spacing: -.01em; }
+h2 { font-size: 1.3rem; margin: 48px 0 12px; }
+h3 { font-size: 1.1rem; margin: 0; }
+p { margin: 0 0 12px; }
+.lede { color: var(--muted); max-width: 70ch; }
+code, .mono { font-family: var(--mono); font-size: .88em; }
+code { background: var(--surface-2); padding: 1px 5px; border-radius: 4px; }
+button.theme { border: 1px solid var(--line); background: var(--surface); color: var(--text); border-radius: 8px;
+  padding: 6px 10px; cursor: pointer; font: inherit; font-size: .9rem; white-space: nowrap; }
+.rule { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 20px 0 0; }
+.rule div { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; font-size: .95rem; }
+.rule b { display: block; margin-bottom: 2px; }
+.tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 16px; }
+.tabs button { border: 1px solid var(--line); background: var(--surface); color: var(--text); border-radius: 999px;
+  padding: 6px 14px; cursor: pointer; font: inherit; font-size: .95rem; }
+.tabs button[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); padding: 20px; }
+.card + .card { margin-top: 16px; }
+.prim { display: none; }
+.prim.active { display: block; }
+.prim-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; margin-bottom: 4px; }
+.tag { font-family: var(--mono); font-size: .8rem; color: var(--accent); background: var(--accent-soft); padding: 2px 8px; border-radius: 6px; }
+.tag.warn { color: var(--warn); background: var(--band); }
+.io { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0; }
+.io > div { background: var(--surface-2); border-radius: 10px; padding: 14px; min-width: 0; }
+.io h4 { margin: 0 0 8px; font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+pre { margin: 0; font: 12.5px/1.5 var(--mono); white-space: pre-wrap; word-break: break-word; }
+.viz { margin: 8px 0 4px; }
+.bar { position: relative; height: 34px; border-radius: 8px; background: var(--surface-2); border: 1px solid var(--line); overflow: hidden; }
+.bar .band { position: absolute; top: 0; bottom: 0; background: var(--warn); opacity: .22; z-index: 1; }
+.bar .fill { position: absolute; top: 0; bottom: 0; left: 0; background: var(--accent); opacity: .85; }
+.bar .tick { z-index: 2; position: absolute; top: -2px; bottom: -2px; width: 2px; background: var(--text); }
+.scale { position: relative; height: 1.3em; font-size: .78rem; color: var(--muted); margin-top: 4px; }
+.scale span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
+.scale span:first-child { transform: none; } .scale span:last-child { transform: translateX(-100%); }
+.readout { font-family: var(--mono); font-size: .9rem; margin-top: 8px; }
+input[type=range] { width: 100%; margin: 12px 0 4px; accent-color: var(--accent); }
+.dist { display: grid; gap: 6px; }
+.dist .row { display: grid; grid-template-columns: 110px 1fr 52px; align-items: center; gap: 8px; font-size: .9rem; }
+.dist .track { height: 18px; background: var(--surface-2); border-radius: 5px; overflow: hidden; }
+.dist .track span { display: block; height: 100%; background: var(--accent); opacity: .5; border-radius: 5px; }
+.dist .row.top .track span { opacity: .95; }
+.dist .num { font-family: var(--mono); text-align: right; font-size: .85rem; }
+.ladder { position: relative; display: grid; gap: 6px; padding-left: 28px; }
+.ladder .lvl { display: grid; grid-template-columns: 26px 1fr 48px; gap: 8px; align-items: center; background: var(--surface-2);
+  border-radius: 8px; padding: 8px 10px; font-size: .9rem; position: relative; }
+.ladder .lvl .i { font-family: var(--mono); color: var(--muted); }
+.ladder .lvl .p { font-family: var(--mono); text-align: right; font-size: .85rem; }
+.ladder .lvl .heat { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 8px; background: var(--accent); opacity: .18; }
+.ladder .lvl > :not(.heat) { position: relative; }
+.ladder .marker { position: absolute; left: 4px; width: 18px; height: 18px; border-radius: 50%; background: var(--accent);
+  border: 3px solid var(--surface); box-shadow: 0 0 0 1px var(--accent); transform: translateY(-50%); transition: top .3s; }
+.ladder .rail { position: absolute; left: 12px; top: 6px; bottom: 6px; width: 2px; background: var(--line); }
+.boxwrap { max-width: 420px; }
+.boxwrap svg { width: 100%; height: auto; display: block; border-radius: 10px; border: 1px solid var(--line); }
+.note { font-size: .9rem; color: var(--muted); }
+.when { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px; }
+.when ul { margin: 6px 0 0; padding-left: 18px; }
+.when li { margin-bottom: 4px; font-size: .95rem; }
+.ex { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin-top: 14px; }
+.ex > div { border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+.ex .dom { font-size: .75rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.ex p { margin: 4px 0 0; font-size: .93rem; }
+.flow { display: grid; gap: 10px; }
+.q { display: grid; grid-template-columns: 32px 1fr; gap: 12px; align-items: start; }
+.q .n { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent);
+  font-weight: 600; font-size: .9rem; }
+.q .body { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; }
+.q .ans { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; font-size: .9rem; }
+.q .ans span { background: var(--surface-2); border-radius: 6px; padding: 2px 8px; }
+.q .ans b { color: var(--accent); }
+table { width: 100%; border-collapse: collapse; font-size: .93rem; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { color: var(--muted); font-weight: 600; font-size: .82rem; text-transform: uppercase; letter-spacing: .05em; }
+.tablewrap { overflow-x: auto; }
+footer { margin-top: 48px; font-size: .85rem; color: var(--muted); }
+@media (max-width: 720px) {
+  .io, .when { grid-template-columns: 1fr; }
+  h1 { font-size: 1.55rem; }
+  .dist .row { grid-template-columns: 84px 1fr 46px; }
+}
+</style>
+</head>
+<body>
+<main>
+  <header class="top">
+    <div>
+      <h1>Jev question patterns</h1>
+      <p class="lede">Jev answers narrow questions about one piece of <code>state</code> with a typed answer and its probabilities.
+        It has four question types. Pick the one whose answer shape your code needs.</p>
+    </div>
+    <button class="theme" id="theme" type="button" aria-label="Toggle colour theme">Theme</button>
+  </header>
+
+  <div class="rule">
+    <div><b>Jev judges, code decides.</b>Ask "does the customer sound frustrated?", then let code decide whether to escalate.</div>
+    <div><b>One request, many questions.</b>Every question sees the same state and is answered independently, in parallel.</div>
+    <div><b>Confidence is not correctness.</b>It measures how concentrated the answer is. Calibrate against human labels.</div>
+    <div><b>Failure is an error.</b>A timeout is never "no". Choose what happens on failure, on purpose.</div>
+  </div>
+
+  <h2>The four primitives</h2>
+  <div class="tabs" role="tablist" id="tabs">
+    <button role="tab" aria-selected="true" data-p="noul">Noul · yes / no</button>
+    <button role="tab" aria-selected="false" data-p="choice">Choice · one of N</button>
+    <button role="tab" aria-selected="false" data-p="score">Score · ordered levels</button>
+    <button role="tab" aria-selected="false" data-p="box">Box · image region</button>
+  </div>
+
+  <!-- NOUL -->
+  <section class="card prim active" id="p-noul" role="tabpanel">
+    <div class="prim-head"><h3>Noul: is this true?</h3><span class="tag">noul</span></div>
+    <p>One statement, one probability of "yes". The number is both the answer and the uncertainty: near 0.5 means the state doesn't settle it.</p>
+    <div class="io">
+      <div><h4>Goes in</h4><pre>{
+  type: "noul",
+  instructions: "Does the customer in `message.body`
+                 ask to speak with a person?",
+  criteria: {            // optional
+    false: "Only describes a problem; never asks
+             for a person, a call or an agent."
+  }
+}</pre></div>
+      <div><h4>Comes out</h4><pre>{ type: "noul", noul: <span id="noul-val">0.82</span> }
+// P(yes). No confidence field.
+// Confidence-style proxy: |2p − 1| = <span id="noul-conf">0.64</span></pre></div>
+    </div>
+    <div class="viz">
+      <div class="bar" aria-hidden="true">
+        <div class="band" style="left:30%;width:40%"></div>
+        <div class="fill" id="noul-fill" style="width:82%"></div>
+        <div class="tick" style="left:30%"></div><div class="tick" style="left:70%"></div>
+      </div>
+      <div class="scale"><span style="left:0">0 · no</span><span style="left:30%">0.3</span><span style="left:50%">review band</span><span style="left:70%">0.7</span><span style="left:100%">yes · 1</span></div>
+      <label class="note" for="noul-slider">Drag to see how code reads it (vendor starting thresholds: yes ≥ 0.7, no ≤ 0.3; tune per check):</label>
+      <input id="noul-slider" type="range" min="0" max="100" value="82">
+      <div class="readout" id="noul-read"></div>
+    </div>
+    <div class="when">
+      <div><b>Pick it when</b><ul>
+        <li>code branches on a yes/no</li>
+        <li>several labels can be true at once (one noul per label)</li>
+        <li>you need "is anything here?" next to a choice or box</li></ul></div>
+      <div><b>Avoid</b><ul>
+        <li>"and" / "or" inside one question: ask two</li>
+        <li>using 0.5 as "medium": that's a score</li>
+        <li>criteria where <code>true</code> describes a "no"</li></ul></div>
+    </div>
+    <div class="ex">
+      <div><span class="dom">Support triage</span><p>Does the customer in <code>message.body</code> ask to speak with a person?</p></div>
+      <div><span class="dom">Agent safety check</span><p>Would running <code>action.text</code> delete data that isn't easily recreated?</p></div>
+      <div><span class="dom">Content moderation</span><p>Does <code>post.text</code> threaten a specific, identifiable person?</p></div>
+    </div>
+  </section>
+
+  <!-- CHOICE -->
+  <section class="card prim" id="p-choice" role="tabpanel">
+    <div class="prim-head"><h3>Choice: which one of these?</h3><span class="tag">choice</span></div>
+    <p>A fixed set of named, unordered options. You get the top label and a probability for every option, summing to 1. The label is always one of yours, even when none fits.</p>
+    <div class="io">
+      <div><h4>Goes in</h4><pre>{
+  type: "choice",
+  instructions: "Which team should handle `doc.text`?",
+  criteria: {
+    finance:    "Payments, invoices, expenses, tax",
+    legal:      "Contracts, disputes, compliance",
+    people:     "Hiring, leave, benefits",
+    operations: "Suppliers, deliveries, IT"
+  }
+}</pre></div>
+      <div><h4>Comes out</h4><pre>{
+  type: "choice",
+  choice: "legal",
+  probabilities: { finance: 0.18, legal: 0.71,
+                   people: 0.03, operations: 0.08 },
+  confidence: 0.61   // (p_max − 1/n) / (1 − 1/n)
+}</pre></div>
+    </div>
+    <div class="viz dist" id="choice-dist"></div>
+    <p class="note" style="margin-top:10px">Other signals worth testing: the top probability itself, or the ratio of top to second (here 0.71 / 0.18 ≈ 3.9).</p>
+    <div class="when">
+      <div><b>Pick it when</b><ul>
+        <li>exactly one of a known set applies</li>
+        <li>you can describe each option in a line that separates it from its neighbours</li>
+        <li>up to 255 options; code removes ineligible ones first</li></ul></div>
+      <div><b>Avoid</b><ul>
+        <li>labels like <code>A</code> or <code>option_1</code></li>
+        <li>a generic "always fits" option that crowds out real ones</li>
+        <li>"nothing fits" handling by assumption: an <code>other</code> option vs a companion noul is contested; test both</li></ul></div>
+    </div>
+    <div class="ex">
+      <div><span class="dom">Document routing</span><p>Which team should handle <code>doc.text</code>? finance · legal · people · operations</p></div>
+      <div><span class="dom">Support triage</span><p>What is <code>message.body</code> mainly about? billing · technical · account · other</p></div>
+      <div><span class="dom">Lead scoring</span><p>Which stage best describes <code>lead.notes</code>? researching · comparing · ready to buy · not a buyer</p></div>
+    </div>
+  </section>
+
+  <!-- SCORE -->
+  <section class="card prim" id="p-score" role="tabpanel">
+    <div class="prim-head"><h3>Score: which level?</h3><span class="tag">score</span></div>
+    <p>An ordered rubric of 2–10 described levels, low to high. You get a probability per level, an expected score (Σ level × probability, so it can fall between levels) and a confidence.</p>
+    <div class="io">
+      <div><h4>Goes in</h4><pre>{
+  type: "score",
+  instructions: "How urgent is the situation
+                 in `message.body`?",
+  criteria: [
+    "A question or suggestion; nothing blocked",
+    "Inconvenient; a workaround exists",
+    "Blocked for this customer, no workaround",
+    "Money lost, data at risk, or many blocked"
+  ]
+}</pre></div>
+      <div><h4>Comes out</h4><pre>{
+  type: "score",
+  score: 2.12,          // expected level
+  probabilities: { 0: 0.02, 1: 0.14,
+                   2: 0.54, 3: 0.30 },
+  legend: { 0: "A question…", … },
+  confidence: 0.58
+}</pre></div>
+    </div>
+    <div class="viz">
+      <div class="ladder" id="ladder"><div class="rail"></div><div class="marker" id="marker"></div></div>
+      <div class="tabs" style="margin-top:12px" id="score-presets">
+        <button aria-selected="true" data-s="peaked">Clear answer</button>
+        <button aria-selected="false" data-s="split">Two peaks</button>
+      </div>
+      <p class="note" id="score-note"></p>
+    </div>
+    <div class="when">
+      <div><b>Pick it when</b><ul>
+        <li>outcomes are ordered: severity, fit, quality, urgency</li>
+        <li>each level can be written as a concrete situation</li>
+        <li>a rubric: one score per criterion, combined in code</li></ul></div>
+      <div><b>Avoid</b><ul>
+        <li>adjectives ("moderately severe") or relative levels ("worse than the last")</li>
+        <li>two dimensions in one score</li>
+        <li>reading the fractional score as a measurement</li></ul></div>
+    </div>
+    <div class="ex">
+      <div><span class="dom">Hiring rubric</span><p>One score per criterion, e.g. how much evidence <code>application.experience</code> shows of leading a team, from "none" to "led several teams for years".</p></div>
+      <div><span class="dom">Lead scoring</span><p>How clearly does <code>call.notes</code> state a budget? not mentioned · vague · range given · approved figure.</p></div>
+      <div><span class="dom">Bug triage</span><p>How severe is <code>issue.body</code>? cosmetic · workaround exists · blocks a user · data loss or outage.</p></div>
+    </div>
+  </section>
+
+  <!-- BOX -->
+  <section class="card prim" id="p-box" role="tabpanel">
+    <div class="prim-head"><h3>Box: where in the image?</h3><span class="tag">box</span><span class="tag warn">opt-in · not production-ready</span></div>
+    <p>Locates what the instructions describe in an image. Edges come back as fractions of height and width from the top-left. It always returns a box, even if the thing isn't there, so pair it with a presence noul.</p>
+    <div class="io">
+      <div><h4>Goes in</h4><pre>// header: TypeSafe-Danger-Zone-Images: true
+// model: jev-1.14 only (as of 2026-11-02)
+{
+  state: image(bytes),   // PNG or JPEG
+  questions: {
+    has_logo: noul("Is a company logo visible?"),
+    logo: { type: "box",
+            instructions: "The company logo" }
+  }
+}</pre></div>
+      <div><h4>Comes out</h4><pre>{
+  type: "box",
+  box: { top: 0.12, bottom: 0.34,
+         left: 0.58, right: 0.90 },
+  confidence: 0.47   // may be null
+}
+// Ignore the box when has_logo is low.</pre></div>
+    </div>
+    <div class="viz boxwrap">
+      <svg viewBox="0 0 400 260" role="img" aria-label="An example image with a highlighted region from top 0.12 to bottom 0.34 and left 0.58 to right 0.90">
+        <rect width="400" height="260" style="fill:var(--surface-2)"/>
+        <rect x="24" y="150" width="150" height="86" rx="6" style="fill:var(--line)"/>
+        <rect x="200" y="160" width="170" height="14" rx="4" style="fill:var(--line)"/>
+        <rect x="200" y="186" width="130" height="14" rx="4" style="fill:var(--line)"/>
+        <circle cx="300" cy="60" r="24" style="fill:var(--muted)" opacity=".5"/>
+        <rect x="232" y="31" width="128" height="57" rx="3" style="fill:var(--accent);fill-opacity:.12;stroke:var(--accent)" stroke-width="2.5" stroke-dasharray="6 4"/>
+        <text x="232" y="24" font-size="12" font-family="ui-monospace, monospace" style="fill:var(--accent)">top .12 · left .58</text>
+        <text x="232" y="106" font-size="12" font-family="ui-monospace, monospace" style="fill:var(--accent)">bottom .34 · right .90</text>
+      </svg>
+    </div>
+    <div class="when">
+      <div><b>Pick it when</b><ul>
+        <li>prototyping "where is X in this image?"</li>
+        <li>you can pair it with a presence noul</li></ul></div>
+      <div><b>Avoid</b><ul>
+        <li>production use (vendor label, 2026-11-02)</li>
+        <li>images outside 280–1568 px per side or over 16 MiB: one bad image fails the request</li></ul></div>
+    </div>
+    <div class="ex">
+      <div><span class="dom">Listing review</span><p>Is the product in the photo damaged (noul)? Where is the damage (box)?</p></div>
+      <div><span class="dom">Document intake</span><p>Is a signature present (noul)? Where is it (box)?</p></div>
+    </div>
+  </section>
+
+  <h2>Which primitive?</h2>
+  <div class="flow">
+    <div class="q"><div class="n">1</div><div class="body">Is the answer a number, a count, a date comparison, a lookup or generated text?
+      <div class="ans"><span>yes → <b>not Jev</b>: do it in code (a choice may pick among candidates code found)</span><span>no → continue</span></div></div></div>
+    <div class="q"><div class="n">2</div><div class="body">Is the input an image and the question "where"?
+      <div class="ans"><span>yes → <b>box</b> + a presence noul</span><span>no → continue</span></div></div></div>
+    <div class="q"><div class="n">3</div><div class="body">Can more than one label be true at once?
+      <div class="ans"><span>yes → <b>one noul per label</b></span><span>no → continue</span></div></div></div>
+    <div class="q"><div class="n">4</div><div class="body">Does code just branch on true / false?
+      <div class="ans"><span>yes → <b>noul</b></span><span>no → continue</span></div></div></div>
+    <div class="q"><div class="n">5</div><div class="body">Are the outcomes ordered, and can you describe each level as a situation?
+      <div class="ans"><span>yes → <b>score</b></span><span>no → continue</span></div></div></div>
+    <div class="q"><div class="n">6</div><div class="body">Is it one of a fixed set of unordered categories?
+      <div class="ans"><span>yes → <b>choice</b> (with a presence noul if "none" is possible)</span><span>no → rethink the question: it may be a decision, not a judgment</span></div></div></div>
+  </div>
+
+  <h2>Decomposing a request</h2>
+  <div class="card tablewrap">
+    <table>
+      <thead><tr><th>The ask</th><th>Becomes</th><th>Code does</th></tr></thead>
+      <tbody>
+        <tr><td>"Should we escalate this ticket?"</td><td>nouls: asks for a person? money being lost? · score: urgency</td><td>a truth table → escalate or not</td></tr>
+        <tr><td>"Tag posts with any policy they break"</td><td>one noul per policy clause</td><td>per-clause thresholds → flag list</td></tr>
+        <tr><td>"Grade this against our rubric"</td><td>one score per criterion, one noul per pass/fail line</td><td>weights → total, plus a review band</td></tr>
+        <tr><td>"Is this agent command risky?"</td><td>code facts first, then one noul per risk</td><td>log / flag / block per check; a deliberate fail mode</td></tr>
+        <tr><td>"Route this document"</td><td>choice over teams + "does any team fit?" noul</td><td>route, or send to a person when nothing fits</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Before any threshold ships</h2>
+  <div class="card">
+    <p>A person labels 10–30 real examples for a first check (50–300 before trusting a production threshold).
+      Run the questions, compare with the labels, read the most confident disagreements together, change one thing, and run again.
+      Choose each check's threshold from its own accuracy-at-confidence table, keep a review band for unsure items, pin the model version,
+      and re-run the suite whenever the model, the wording or the inputs change.</p>
+    <p class="note">Everything placed in <code>state</code> is sent to TypeSafe. Keep secrets out.</p>
+  </div>
+
+  <footer>Facts as of 2026-11-02. Model versions, limits and the opt-in features change; re-check the live documentation before relying on a number.</footer>
+</main>
+<script>
+(function () {
+  var root = document.documentElement;
+  var btn = document.getElementById("theme");
+  try { var saved = localStorage.getItem("jev-theme"); if (saved) root.setAttribute("data-theme", saved); } catch (e) {}
+  btn.addEventListener("click", function () {
+    var dark = root.getAttribute("data-theme") === "dark" ||
+      (!root.getAttribute("data-theme") && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    var next = dark ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+    try { localStorage.setItem("jev-theme", next); } catch (e) {}
+  });
+
+  // tabs
+  var tabs = document.querySelectorAll("#tabs button");
+  tabs.forEach(function (t) {
+    t.addEventListener("click", function () {
+      tabs.forEach(function (o) { o.setAttribute("aria-selected", o === t ? "true" : "false"); });
+      document.querySelectorAll(".prim").forEach(function (p) { p.classList.toggle("active", p.id === "p-" + t.dataset.p); });
+    });
+  });
+
+  // noul
+  var slider = document.getElementById("noul-slider");
+  function noul() {
+    var p = slider.value / 100;
+    document.getElementById("noul-fill").style.width = (p * 100) + "%";
+    document.getElementById("noul-val").textContent = p.toFixed(2);
+    document.getElementById("noul-conf").textContent = Math.abs(2 * p - 1).toFixed(2);
+    var read = p >= 0.7 ? "yes: act on it" : p <= 0.3 ? "no: act on it" : "review band: the state doesn't settle it; send to a person or a default";
+    document.getElementById("noul-read").textContent = "p(yes) = " + p.toFixed(2) + " → " + read;
+  }
+  slider.addEventListener("input", noul); noul();
+
+  // choice
+  var probs = [["finance", 0.18], ["legal", 0.71], ["people", 0.03], ["operations", 0.08]];
+  var max = Math.max.apply(null, probs.map(function (x) { return x[1]; }));
+  document.getElementById("choice-dist").innerHTML = probs.map(function (x) {
+    return '<div class="row' + (x[1] === max ? " top" : "") + '"><span>' + x[0] + '</span><div class="track"><span style="width:' +
+      (x[1] * 100) + '%"></span></div><span class="num">' + x[1].toFixed(2) + "</span></div>";
+  }).join("");
+
+  // score
+  var levels = ["A question or suggestion; nothing blocked", "Inconvenient; a workaround exists",
+    "Blocked for this customer, no workaround", "Money lost, data at risk, or many blocked"];
+  var presets = {
+    peaked: { p: [0.02, 0.14, 0.54, 0.30], note: "Most probability sits on one level, so the expected score (2.12) is a fair summary." },
+    split: { p: [0.42, 0.06, 0.08, 0.44], note: "Two peaks: the expected score (1.54) lands between levels nobody chose. Read the probabilities, not just the score." }
+  };
+  var ladder = document.getElementById("ladder");
+  var rows = levels.map(function (l, i) { return { l: l, i: i }; }).reverse();
+  ladder.insertAdjacentHTML("beforeend", rows.map(function (r) {
+    return '<div class="lvl" data-i="' + r.i + '"><div class="heat"></div><span class="i">' + r.i + '</span><span>' + r.l + '</span><span class="p"></span></div>';
+  }).join(""));
+  function score(name) {
+    var pr = presets[name].p;
+    var s = pr.reduce(function (a, p, i) { return a + i * p; }, 0);
+    ladder.querySelectorAll(".lvl").forEach(function (el) {
+      var i = +el.dataset.i;
+      el.querySelector(".p").textContent = pr[i].toFixed(2);
+      el.querySelector(".heat").style.width = (pr[i] * 100) + "%";
+    });
+    var els = Array.prototype.slice.call(ladder.querySelectorAll(".lvl"));
+    var top = function (i) { var e = els.filter(function (x) { return +x.dataset.i === i; })[0]; return e.offsetTop + e.offsetHeight / 2; };
+    var lo = Math.floor(s), hi = Math.min(levels.length - 1, lo + 1), f = s - lo;
+    document.getElementById("marker").style.top = (top(lo) + (top(hi) - top(lo)) * f) + "px";
+    document.getElementById("score-note").textContent = "Expected score " + s.toFixed(2) + ". " + presets[name].note;
+  }
+  var sb = document.querySelectorAll("#score-presets button");
+  sb.forEach(function (b) {
+    b.addEventListener("click", function () {
+      sb.forEach(function (o) { o.setAttribute("aria-selected", o === b ? "true" : "false"); });
+      score(b.dataset.s);
+    });
+  });
+  // position the marker once the score tab is visible
+  document.querySelector('[data-p="score"]').addEventListener("click", function () { score(document.querySelector('#score-presets [aria-selected="true"]').dataset.s); });
+  window.addEventListener("resize", function () { if (document.getElementById("p-score").classList.contains("active")) score(document.querySelector('#score-presets [aria-selected="true"]').dataset.s); });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+{"id":"s01","question":"wants_human","type":"noul","expected":"yes","answer":"yes","p_yes":0.96}
+{"id":"s02","question":"wants_human","type":"noul","expected":"no","answer":"no","p_yes":0.04}
+{"id":"s03","question":"wants_human","type":"noul","expected":"no","answer":"no","p_yes":0.07}
+{"id":"s04","question":"wants_human","type":"noul","expected":"YES","answer":"yes","p_yes":"0.93"}
+{"id":"s05","question":"wants_human","type":"noul","expected":"no","answer":"no","p_yes":0.02}
+{"id":"s06","question":"wants_human","type":"noul","expected":false,"answer":"no","p_yes":0.11}
+{"id":"s01","question":"topic","type":"choice","expected":"Billing","answer":"billing","confidence":0.9,"probability":0.93}
+{"id":"s02","question":"topic","type":"choice","expected":"technical","answer":"technical","confidence":0.8,"probability":0.85}

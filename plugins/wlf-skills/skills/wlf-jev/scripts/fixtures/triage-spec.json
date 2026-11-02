@@ -1,0 +1,47 @@
+{
+  "name": "support-triage",
+  "version": "2",
+  "model": "jev-1.14.0",
+  "state_fields": [
+    "subject",
+    "body",
+    "customer_plan"
+  ],
+  "notes": "The null case is contested (an `other` option vs a companion noul). This spec carries both so calibration can pick: topic.other and topic_fits.",
+  "questions": {
+    "wants_human": {
+      "type": "noul",
+      "instructions": "Does the customer in `body` ask to speak with a person?",
+      "criteria": {
+        "false": "The customer only describes a problem or asks a question, and never asks for a person, a call or an agent."
+      }
+    },
+    "topic": {
+      "type": "choice",
+      "instructions": "What is the message in `body` mainly about?",
+      "criteria": {
+        "billing": "Charges, invoices, refunds, payment methods",
+        "technical": "Something in the product is broken, slow or erroring",
+        "account": "Login, password, access, team members, settings",
+        "other": "A request that is not billing, a product fault or account access, such as a feature idea or general question"
+      }
+    },
+    "urgency": {
+      "type": "score",
+      "instructions": "How urgent is the situation described in `body`?",
+      "criteria": [
+        "A question or suggestion; nothing is blocked",
+        "Something is inconvenient but a workaround exists",
+        "Work is blocked for this customer with no workaround",
+        "Money is being lost, data is at risk, or many users are blocked"
+      ]
+    },
+    "topic_fits": {
+      "type": "noul",
+      "instructions": "Is the message in `body` about billing, a product fault, or account access?",
+      "criteria": {
+        "false": "The message is a feature idea, a general question, or something unrelated to billing, faults or access."
+      }
+    }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "name": "theamazingwolf",
+  "description": "Public agent skills and Claude Code plugins by Tim Wolf.",
+  "owner": {
+    "name": "Tim Wolf",
+    "url": "https://timwolf.com"
+  },
+  "metadata": {
+    "description": "Public agent skills and Claude Code plugins by Tim Wolf.",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "wlf-skills",
+      "source": "./plugins/wlf-skills",
+      "description": "Tim Wolf's public agent skills. Includes wlf-jev: design, code, calibrate and run TypeSafe Jev typed-judgment questions in your codebase, with runner and calibration scripts, TypeScript starters and a visual explainer.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Tim Wolf"
+      },
+      "license": "MIT",
+      "homepage": "https://github.com/theamazingwolf/skills",
+      "category": "development",
+      "keywords": [
+        "agent-skills",
+        "typesafe",
+        "jev",
+        "calibration"
+      ]
+    }
+  ]
+}

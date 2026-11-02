@@ -1,0 +1,14 @@
+{
+  "name": "wlf-skills",
+  "displayName": "WLF Skills",
+  "version": "1.0.0",
+  "description": "Tim Wolf's public agent skills. Includes wlf-jev: design, code, calibrate and run TypeSafe Jev typed-judgment questions in your codebase, with runner and calibration scripts, TypeScript starters and a visual explainer.",
+  "author": {
+    "name": "Tim Wolf",
+    "url": "https://timwolf.com"
+  },
+  "homepage": "https://github.com/theamazingwolf/skills",
+  "repository": "https://github.com/theamazingwolf/skills",
+  "license": "MIT",
+  "keywords": ["agent-skills", "typesafe", "jev", "classification", "calibration", "llm-judge", "typescript"]
+}
